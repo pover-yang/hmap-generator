@@ -107,7 +107,7 @@ cv::Mat HeatMapGenerator::Infer(cv::Mat &image) {
     }
 
     cv::Mat heatmap = cv::Mat(out_dim[1], out_dim[2], CV_32FC3, output_data);
-    printf("heatmap size (h,w,c): %d, %d, %d\n", heatmap.rows, heatmap.cols, heatmap.channels());
+    fprintf(stdout, "heatmap size (h,w,c): %d, %d, %d\n", heatmap.rows, heatmap.cols, heatmap.channels());
 
     return heatmap;
 }
