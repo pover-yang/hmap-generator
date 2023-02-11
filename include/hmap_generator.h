@@ -16,14 +16,25 @@ public:
 
     void Init(const char* model_path);
 
-    cv::Mat Infer(cv::Mat& image);
+    cv::Mat InferFP32(cv::Mat& image);
+
+    cv::Mat InferUInt8(cv::Mat& image);
 
     void Infer(const char* image_path, const char* heatmap_path);
 
+    float input_scale = 0.f;
+    int input_zero_point = 0;
+    float output_scale = 0.f;
+    int output_zero_point = 0;
 
 private:
     graph_t graph_;
     options opt_;
+    tensor_t input_tensor_;
+    tensor_t output_tensor_;
+    int input_buffer_size_;
+    int out_dim_[4];
+
 };
 
 

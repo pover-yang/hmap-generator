@@ -30,7 +30,11 @@ FIND_PACKAGE(OpenCV REQUIRED)
 
 # Build hmap_generator library
 FILE(GLOB TENGINE_LIBS ${TENGINE_LIB_DIR}/*.so)
+
+# TODO: temporary test
 ADD_LIBRARY(hmap_generator SHARED src/hmap_generator.cpp)
+#ADD_LIBRARY(hmap_generator STATIC src/hmap_generator.cpp)
+
 TARGET_INCLUDE_DIRECTORIES(hmap_generator PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/3rdparty/tengine/include
