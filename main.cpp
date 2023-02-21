@@ -5,24 +5,26 @@
 
 
 cv::Mat preprocess(const cv::Mat &image, float mean, float var, float scale, int zero_point) {
-    float tmp = var * scale;
-
     cv::Mat dst_img;
-    cv::resize(image, dst_img, cv::Size(640, 400));
-    dst_img.convertTo(dst_img, CV_32FC1, 1.0 / 255);
-    dst_img = (dst_img - cv::Scalar(mean)) / cv::Scalar(tmp) + cv::Scalar(zero_point);
-    dst_img.convertTo(dst_img, CV_8UC1);
+//    float tmp = var * scale;
+//    cv::resize(image, dst_img, cv::Size(640, 400));
+//    dst_img.convertTo(dst_img, CV_32FC1, 1.0 / 255);
+//    dst_img = (dst_img - cv::Scalar(mean)) / cv::Scalar(tmp) + cv::Scalar(zero_point);
+//    dst_img.convertTo(dst_img, CV_8UC1);
 
+    cv::resize(image, dst_img, cv::Size(640, 400));
+    dst_img = dst_img * scale + zero_point;
     return dst_img;
 }
 
 
 cv::Mat postprocess(const cv::Mat &image, float scale, int zero_point) {
     cv::Mat dst_img;
-    image.convertTo(dst_img, CV_32FC3);
-    dst_img = (dst_img - zero_point) * scale;
-    dst_img.convertTo(dst_img, CV_8UC3, 255);
-    cv::resize(dst_img, dst_img, cv::Size(1280, 800));
+//    image.convertTo(dst_img, CV_32FC3);
+//    dst_img = (dst_img - zero_point) * scale;
+//    dst_img.convertTo(dst_img, CV_8UC3, 255);
+//    cv::resize(dst_img, dst_img, cv::Size(1280, 800));
+    cv::resize(image, dst_img, cv::Size(1280, 800), 0, 0, cv::INTER_NEAREST);
     return dst_img;
 }
 
@@ -32,7 +34,7 @@ int main(int argc, char **argv) {
     std::string image_path = argv[2];
 
     HeatMapGenerator hmap_generator = HeatMapGenerator();
-    hmap_generator.Init(model_path.c_str());
+    hmap_generator.Init(model_path, "cpu");
     float input_scale = hmap_generator.input_scale;
     int input_zero_point = hmap_generator.input_zero_point;
     float output_scale = hmap_generator.output_scale;
