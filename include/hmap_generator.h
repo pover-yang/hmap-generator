@@ -14,7 +14,7 @@ public:
     HeatMapGenerator() = default;
     ~HeatMapGenerator();
 
-    void Init(const char* model_path);
+    void Init(const std::string& model_path, const std::string& context_name);
 
     cv::Mat InferFP32(cv::Mat& image);
 

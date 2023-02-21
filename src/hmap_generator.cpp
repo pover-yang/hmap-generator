@@ -5,7 +5,7 @@
 #include "hmap_generator.h"
 
 
-void HeatMapGenerator::Init(const char *model_path) {
+void HeatMapGenerator::Init(const std::string& model_path, const std::string& context_name) {
     /* init tengine */
     if (init_tengine() != 0) {
         fprintf(stderr, "Init tengine failed.\n");
@@ -18,30 +18,35 @@ void HeatMapGenerator::Init(const char *model_path) {
     opt_.precision = TENGINE_MODE_UINT8;
     opt_.affinity = 255;
 
-    /* create VeriSilicon TIM-VX backend */
-    context_t timvx_context = create_context("timvx", 1);
-    int rtt = set_context_device(timvx_context, "TIMVX", nullptr, 0);
-    if (0 > rtt)
-    {
-        fprintf(stderr, " add_context_device VSI DEVICE failed.\n");
-        exit(1);
+    /* create context */
+    context_t context = nullptr;
+    if (context_name == "timvx"){
+        /* create VeriSilicon TIM-VX backend */
+        context = create_context("timvx", 1);
+        int rtt = set_context_device(context, "TIMVX", nullptr, 0);
+        if (rtt < 0)
+        {
+            fprintf(stderr, " add_context_device VSI DEVICE failed.\n");
+            exit(1);
+        }
     }
 
     /* load model */
-    graph_ = create_graph(timvx_context, "tengine", model_path);
+    graph_ = create_graph(context, "tengine", model_path.c_str());
     if (graph_ == nullptr) {
         fprintf(stderr, "Create graph failed.\n");
         exit(1);
     }
 
+    /* get input tensor quantization params */
     input_tensor_ = get_graph_input_tensor(graph_, 0, 0);
     if (input_tensor_ == nullptr) {
         fprintf(stderr, "Get input tensor failed\n");
         exit(1);
     }
-
     get_tensor_quant_param(input_tensor_, &input_scale, &input_zero_point, 1);
 
+    /* set input tensor shape */
     int img_h = 400;
     int img_w = 640;
     int img_c = 1;
@@ -58,6 +63,7 @@ void HeatMapGenerator::Init(const char *model_path) {
         exit(1);
     }
 
+    /* get output tensor quantization params */
     output_tensor_ = get_graph_output_tensor(graph_, 0, 0);
     if (get_tensor_shape(output_tensor_, out_dim_, 4) < 0) {
         fprintf(stderr, "Get output tensor shape failed\n");
